@@ -16,8 +16,8 @@ public class FileHandler {
 	private static final String DIALOG_SAVE = "Datei speichern";
 	private static final String DIALOG_OPEN = "Datei laden";
 	
-	protected void saveFile(JFrame topFrame, String content) {
-		String choosedFile = FileDialog(DIALOG_SAVE, topFrame);
+	protected void saveFile(JFrame topFrame, String content, String path) {
+		String choosedFile = path;
 		if (!choosedFile.isEmpty()) {
 		    try (
 				OutputStream fos = new FileOutputStream(choosedFile);
@@ -30,20 +30,37 @@ public class FileHandler {
 		}
 	}
 	
-	protected void openFile(JFrame topFrame) {
+	protected String saveFile(JFrame topFrame) {
+		String choosedFile = FileDialog(DIALOG_SAVE, topFrame);
+		if (!choosedFile.isEmpty()) {
+		    try (
+				OutputStream fos = new FileOutputStream(choosedFile);
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				) {
+		    			oos.writeObject(null);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+		}
+		return choosedFile;
+	}
+	
+	protected String openFile(JFrame topFrame) {
 		String file = FileDialog(DIALOG_OPEN, topFrame);
 		if (!file.isEmpty()) {
 		    try (
 		    		InputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				) {
-		    			//Object contentFile = openFormat(ois.readObject());
-		    			//caller.decisions = (ArrayList<String>) contentFile;
-					ois.close();
+		    			return ois.readObject().toString();
 				} catch (IOException ex) {
 					ex.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 		}
+		return null;
 	}
 	
 	private String FileDialog(String title, JFrame caller) {
@@ -53,6 +70,6 @@ public class FileHandler {
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    return fileChooser.getSelectedFile().getAbsolutePath();
 		}
-		return null;
+		return "";
 	}
 }

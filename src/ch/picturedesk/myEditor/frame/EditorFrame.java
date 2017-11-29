@@ -25,7 +25,7 @@ public class EditorFrame extends JFrame {
 	private void buildGui() {
 		frame = new JFrame("MyEditor");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    noFile = new JLabel("No file loaded",SwingConstants.CENTER);
+	    noFile = new JLabel("No file loaded", SwingConstants.CENTER);
 
 	    infoArea = new InfoArea();
 	    buttonArea = new ButtonArea(this);
@@ -44,12 +44,20 @@ public class EditorFrame extends JFrame {
 		return workArea;
 	}
 	
-	public void setWorkArea() {
-	    workArea = new WorkArea();
+	public InfoArea getInfoArea() {
+		return infoArea;
+	}
+	
+	public void setWorkArea(String path, String content) {
+	    workArea = new WorkArea(path,content);
 	    scrollPane = new JScrollPane(workArea);
 	    frame.remove(noFile);
 	    frame.getContentPane().add(scrollPane, "Center");
-	    buttonArea.toggleSaveClose(true);
+	    infoArea.setLabel(path);
+	    buttonArea.toggleClose(true);
+	    buttonArea.toggleSave(true);
+	    buttonArea.toggleNew(false);
+	    workArea.grabFocus();
 	    frame.setVisible(true);
 	}
 	
@@ -58,7 +66,10 @@ public class EditorFrame extends JFrame {
 			frame.remove(scrollPane);
 		}
 	    frame.getContentPane().add(noFile, "Center");
-	    buttonArea.toggleSaveClose(false);
+	    infoArea.setLabel();
+	    buttonArea.toggleClose(false);
+	    buttonArea.toggleSave(false);
+	    buttonArea.toggleNew(true);
 	    frame.repaint();
 	}
 }
