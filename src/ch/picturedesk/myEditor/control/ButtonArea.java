@@ -1,10 +1,11 @@
-package ch.picturedesk.myEditor.frame;
+package ch.picturedesk.myEditor.control;
 
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import ch.picturedesk.myEditor.view.EditorFrame;
 
 
 public class ButtonArea extends JPanel {
@@ -13,8 +14,6 @@ public class ButtonArea extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 2245946514107325745L;
-	
-	private FileHandler fileHandler = new FileHandler();
 
 	private JButton newB;
 	private JButton save;
@@ -37,33 +36,20 @@ public class ButtonArea extends JPanel {
 		//Action Listeners
 		
 		newB.addActionListener(e-> {
-			String path = fileHandler.saveFile(editorFrame);
-			if(!path.isEmpty() ) {
-				editorFrame.setWorkArea(path,null);
-			}
+			editorFrame.getFileHandler().saveFile(editorFrame);
 		});
 		
 		open.addActionListener(e-> {
-			String content = fileHandler.openFile(editorFrame);
-			editorFrame.setWorkArea(path, content);
+			editorFrame.getFileHandler().openFile(editorFrame);
 		});
 		
 		save.addActionListener(e-> {
-			fileHandler.saveFile(editorFrame, readContent(editorFrame), editorFrame.getWorkArea().getPath());
-			JOptionPane.showMessageDialog(editorFrame,
-                    "Text gespeichert",
-                    "Speichern",
-                    JOptionPane.INFORMATION_MESSAGE);
-			editorFrame.getWorkArea().grabFocus();
+			editorFrame.getFileHandler().saveFile(editorFrame, editorFrame.getWorkArea().getPath());
 		});
 		
 		close.addActionListener(e-> {
 			editorFrame.closeWorkArea();
 		});
-	}
-
-	private String readContent(EditorFrame editorFrame) {
-		return editorFrame.getWorkArea().getText();	
 	}
 
 	public void toggleNew(boolean visibilty) {

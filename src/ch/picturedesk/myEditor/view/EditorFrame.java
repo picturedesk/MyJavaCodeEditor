@@ -1,9 +1,13 @@
-package ch.picturedesk.myEditor.frame;
+package ch.picturedesk.myEditor.view;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+
+import ch.picturedesk.myEditor.control.ButtonArea;
+import ch.picturedesk.myEditor.control.FileHandler;
+import ch.picturedesk.myEditor.model.WorkArea;
 
 public class EditorFrame extends JFrame {
 
@@ -17,6 +21,8 @@ public class EditorFrame extends JFrame {
 	private WorkArea workArea;
 	private JLabel noFile;
 	private JScrollPane scrollPane;
+	private MenuArea menuArea;
+    private FileHandler fileHandler;
 	
 	public EditorFrame() {
 	    buildGui();
@@ -26,26 +32,21 @@ public class EditorFrame extends JFrame {
 		frame = new JFrame("MyEditor");
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    noFile = new JLabel("No file loaded", SwingConstants.CENTER);
+	    setFileHandler();
 
 	    infoArea = new InfoArea();
 	    buttonArea = new ButtonArea(this);
+	    menuArea = new MenuArea(this);
 	    
 	    frame.getContentPane().add(infoArea, "North");
 		closeWorkArea();
 	    frame.getContentPane().add(buttonArea, "South");
+	    frame.setJMenuBar(menuArea);
 	    
 	    frame.setVisible(true);
 
 	    frame.setSize(800, 600);
 	    frame.setVisible(true);
-	}
-	
-	public WorkArea getWorkArea() {
-		return workArea;
-	}
-	
-	public InfoArea getInfoArea() {
-		return infoArea;
 	}
 	
 	public void setWorkArea(String path, String content) {
@@ -71,5 +72,21 @@ public class EditorFrame extends JFrame {
 	    buttonArea.toggleSave(false);
 	    buttonArea.toggleNew(true);
 	    frame.repaint();
+	}
+	
+	public FileHandler getFileHandler() {
+		return fileHandler;
+	}
+
+	public void setFileHandler() {
+		fileHandler = new FileHandler();
+	}
+
+	public WorkArea getWorkArea() {
+		return workArea;
+	}
+	
+	public InfoArea getInfoArea() {
+		return infoArea;
 	}
 }

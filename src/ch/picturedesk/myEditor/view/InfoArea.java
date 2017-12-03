@@ -1,4 +1,4 @@
-package ch.picturedesk.myEditor.frame;
+package ch.picturedesk.myEditor.view;
 
 import java.awt.FlowLayout;
 

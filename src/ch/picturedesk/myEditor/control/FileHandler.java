@@ -1,4 +1,4 @@
-package ch.picturedesk.myEditor.frame;
+package ch.picturedesk.myEditor.control;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,67 +9,78 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import ch.picturedesk.myEditor.view.EditorFrame;
 
 public class FileHandler {
 	
 	private static final String DIALOG_SAVE = "Datei speichern";
 	private static final String DIALOG_OPEN = "Datei laden";
 	
-	protected void saveFile(JFrame topFrame, String content, String path) {
+	public void saveFile(EditorFrame editorFrame, String path) {
 		String choosedFile = path;
 		if (!choosedFile.isEmpty()) {
 		    try (
 				OutputStream fos = new FileOutputStream(choosedFile);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				) {
-		    			oos.writeObject(content);
+		    			oos.writeObject(readContent(editorFrame));
+		    			JOptionPane.showMessageDialog(editorFrame,
+		                        "Text gespeichert",
+		                        "Speichern",
+		                        JOptionPane.INFORMATION_MESSAGE);
+		    			editorFrame.getWorkArea().grabFocus();
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
 		}
 	}
 	
-	protected String saveFile(JFrame topFrame) {
-		String choosedFile = FileDialog(DIALOG_SAVE, topFrame);
+	public void saveFile(EditorFrame editorFrame) {
+		String choosedFile = FileDialog(DIALOG_SAVE, editorFrame);
 		if (!choosedFile.isEmpty()) {
 		    try (
 				OutputStream fos = new FileOutputStream(choosedFile);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				) {
 		    			oos.writeObject(null);
+		    			if(!choosedFile.isEmpty() ) {
+		    				editorFrame.setWorkArea(choosedFile,null);
+		    			}
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
 		}
-		return choosedFile;
 	}
 	
-	protected String openFile(JFrame topFrame) {
-		String file = FileDialog(DIALOG_OPEN, topFrame);
+	public void openFile(EditorFrame editorFrame) {
+		String file = FileDialog(DIALOG_OPEN, editorFrame);
 		if (!file.isEmpty()) {
 		    try (
 		    		InputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				) {
-		    			return ois.readObject().toString();
+		    			editorFrame.setWorkArea(file, ois.readObject().toString());
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
-		return null;
 	}
 	
-	private String FileDialog(String title, JFrame caller) {
+	private String FileDialog(String title, EditorFrame editorFrame) {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle(title);
-		int userSelection = fileChooser.showSaveDialog(caller);
+		int userSelection = fileChooser.showSaveDialog(editorFrame);
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    return fileChooser.getSelectedFile().getAbsolutePath();
 		}
 		return "";
+	}
+
+	private String readContent(EditorFrame editorFrame) {
+		return editorFrame.getWorkArea().getText();	
 	}
 }

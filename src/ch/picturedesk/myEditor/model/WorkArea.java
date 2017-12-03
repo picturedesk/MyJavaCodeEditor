@@ -1,4 +1,4 @@
-package ch.picturedesk.myEditor.frame;
+package ch.picturedesk.myEditor.model;
 
 import javax.swing.JEditorPane;
 
