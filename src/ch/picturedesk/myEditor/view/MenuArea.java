@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class MenuArea extends JMenuBar {
 
@@ -24,6 +25,7 @@ public class MenuArea extends JMenuBar {
 
 	private JMenu fileMenu() {
 		JMenu fileMenu = new JMenu("File");
+		
 	    JMenuItem newItem = new JMenuItem("New File");
 	    fileMenu.add(newItem);
 	    newItem.addActionListener(new ActionListener() {
@@ -53,6 +55,20 @@ public class MenuArea extends JMenuBar {
 	    	  	editorFrame.getFileHandler().saveFile(editorFrame, editorFrame.getWorkArea().getPath());
 	      }
 	    });
+	    
+	    JMenuItem exitItem = new JMenuItem("Exit");
+	    fileMenu.add(exitItem);
+	    exitItem.addActionListener(new ActionListener() {
+	      
+	      @Override
+	      public void actionPerformed(ActionEvent e) {
+	    	  	int wertInt = JOptionPane.showConfirmDialog(null, "You want to quit?", "Quit", JOptionPane.YES_NO_OPTION);
+			if (wertInt == JOptionPane.YES_OPTION) {
+				System.exit(0);
+			}
+	      }
+	    });
+	    
 		return fileMenu;
 	}
 }

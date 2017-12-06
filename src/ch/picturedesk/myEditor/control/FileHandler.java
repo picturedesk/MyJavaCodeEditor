@@ -1,14 +1,12 @@
 package ch.picturedesk.myEditor.control;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import ch.picturedesk.myEditor.view.EditorFrame;
@@ -17,15 +15,18 @@ public class FileHandler {
 	
 	private static final String DIALOG_SAVE = "Datei speichern";
 	private static final String DIALOG_OPEN = "Datei laden";
+	private FileOpenDialog openDialog = new FileOpenDialog();
+	private FileSaveDialog saveDialog = new FileSaveDialog();
 	
 	public void saveFile(EditorFrame editorFrame, String path) {
 		String choosedFile = path;
 		if (!choosedFile.isEmpty()) {
 		    try (
 				OutputStream fos = new FileOutputStream(choosedFile);
-				ObjectOutputStream oos = new ObjectOutputStream(fos);
+		    		OutputStreamWriter oos = new OutputStreamWriter(fos, "UTF-8");
 				) {
-		    			oos.writeObject(readContent(editorFrame));
+		    			oos.write(readContent(editorFrame));
+		    			oos.close();
 		    			JOptionPane.showMessageDialog(editorFrame,
 		                        "Text gespeichert",
 		                        "Speichern",
@@ -38,13 +39,14 @@ public class FileHandler {
 	}
 	
 	public void saveFile(EditorFrame editorFrame) {
-		String choosedFile = FileDialog(DIALOG_SAVE, editorFrame);
+		String choosedFile = saveDialog.FileDialog(DIALOG_SAVE, editorFrame);
 		if (!choosedFile.isEmpty()) {
 		    try (
 				OutputStream fos = new FileOutputStream(choosedFile);
-				ObjectOutputStream oos = new ObjectOutputStream(fos);
+		    		OutputStreamWriter oos = new OutputStreamWriter(fos, "UTF-8");
 				) {
-		    			oos.writeObject(null);
+		    			oos.write("");
+		    			oos.close();
 		    			if(!choosedFile.isEmpty() ) {
 		    				editorFrame.setWorkArea(choosedFile,null);
 		    			}
@@ -55,29 +57,24 @@ public class FileHandler {
 	}
 	
 	public void openFile(EditorFrame editorFrame) {
-		String file = FileDialog(DIALOG_OPEN, editorFrame);
+		String file = openDialog.FileDialog(DIALOG_OPEN, editorFrame);
 		if (!file.isEmpty()) {
 		    try (
-		    		InputStream fis = new FileInputStream(file);
-				ObjectInputStream ois = new ObjectInputStream(fis);
+		    		FileReader fis = new FileReader(file);
+		    		BufferedReader ois = new BufferedReader(fis);
 				) {
-		    			editorFrame.setWorkArea(file, ois.readObject().toString());
+		    			String sCurrentLine;
+		    			StringBuilder buffer = new StringBuilder();
+					while ((sCurrentLine = ois.readLine()) != null) {
+						buffer.append(sCurrentLine);
+						buffer.append('\n');
+					}
+		    			editorFrame.setWorkArea(file, buffer.toString());
+		    			ois.close();
 				} catch (IOException ex) {
 					ex.printStackTrace();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
 				}
 		}
-	}
-	
-	private String FileDialog(String title, EditorFrame editorFrame) {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle(title);
-		int userSelection = fileChooser.showSaveDialog(editorFrame);
-		if (userSelection == JFileChooser.APPROVE_OPTION) {
-		    return fileChooser.getSelectedFile().getAbsolutePath();
-		}
-		return "";
 	}
 
 	private String readContent(EditorFrame editorFrame) {
